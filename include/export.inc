@@ -50,3 +50,4 @@ EINTR equ 4
 %include "include/poll.inc"
 %include "include/socket.inc"
 %include "include/fcntl.inc"
+%include "include/vector.inc"
