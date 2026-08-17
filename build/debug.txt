@@ -1,0 +1,61 @@
+     1                                  [bits 64]
+     2                                  
+     3                                  SYS_brk equ 12
+     4                                  
+     5                                  struc BaseChunk
+     6 00000000 ????????????????            .size: resq 1
+     7 00000008 ??                          .free: resb 1
+     8 00000009 ??????????????                  alignb 8
+     9 00000010 ????????????????            .next: resq 1
+    10                                  endstruc
+    11                                  
+    12                                  %if BaseChunk != 24
+    13                                      %error "chunk size mismatch, unaligned"
+    13          ******************       error: chunk size mismatch, unaligned
+    14                                  %endif
+    15                                  
+    16                                  section .data
+    17                                  
+    18                                  section .text
+    19                                      global sbrk
+    20                                      global vi_malloc
+    21                                      global vi_free
+    22                                      
+    23                                  sbrk:
+    24                                  
+    25 00000000 53                          push rbx
+    26                                  
+    27 00000001 57                          push rdi
+    28                                      ; rdi request N
+    29                                  
+    30 00000002 B80C000000                  mov rax,SYS_brk
+    31 00000007 4831FF                      xor rdi,rdi
+    32 0000000A 0F05                        syscall
+    33                                      
+    34 0000000C 4889C3                      mov rbx,rax
+    35                                      
+    36 0000000F 5F                          pop rdi
+    37 00000010 488D043B                    lea rax,[rbx + rdi]
+    38                                  
+    39 00000014 4889C7                      mov rdi,rax
+    40 00000017 B80C000000                  mov rax,SYS_brk
+    41 0000001C 0F05                        syscall
+    42                                  
+    43 0000001E 4883F8FF                    cmp rax,-1
+    44 00000022 7505                        jne .L01
+    45                                  
+    46 00000024 4831C0                      xor rax,rax
+    47 00000027 5B                          pop rbx
+    48 00000028 C3                          ret
+    49                                  
+    50                                  .L01:
+    51                                  
+    52 00000029 5B                          pop rbx
+    53 0000002A C3                          ret 
+    54                                  
+    55                                  vi_malloc:
+    56 0000002B 31C0                        xor eax,eax
+    57 0000002D C3                          ret
+    58                                  
+    59                                  vi_free:
+    60 0000002E C3                          ret
