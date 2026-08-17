@@ -268,6 +268,7 @@ main:
     mov dword [rsp + r12 * pollfd_size + pollfd.fd],edi
 
     dec dword [rel ndfs]
+    inc r12
 
     mov rdi,r13
     call vi_free
@@ -344,7 +345,7 @@ _start:
     call init_runtime
 
     call main
-
+    
     pop r12
     pop rbx
 
